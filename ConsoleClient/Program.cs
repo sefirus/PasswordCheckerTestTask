@@ -2,8 +2,7 @@
 
 var reader = new PasswordReader();
 
-var x = reader.ReadPasswords("D:/Repositories/trash/PasswordCheckerTestDate.txt");
-foreach (var passwordEntry in x)
-{
-    Console.WriteLine(passwordEntry);
-}
+var filePath = "D:/Repositories/trash/PasswordCheckerTestDate.txt";
+
+var checker = new PasswordChecker.PasswordChecker();
+Console.WriteLine(checker.CountValidPasswords(filePath));
