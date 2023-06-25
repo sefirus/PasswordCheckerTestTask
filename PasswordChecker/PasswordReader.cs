@@ -11,36 +11,44 @@ public class PasswordReader : IPasswordReader
 
         foreach (var line in lines)
         {
+            if (string.IsNullOrWhiteSpace(line))
+            {
+                continue;
+            }
             yield return ParseLine(line);
         }
     }
 
     private static PasswordEntry ParseLine(ReadOnlySpan<char> line)
     {
-        var index1 = line.IndexOf(' ');
-        var index2 = line.IndexOf('-');
-        var index3 = line.IndexOf(':');
+        line = line.Trim();
+        var spaceIndex = line.IndexOf(' ');
+        var requiredChar = line.Slice(0, spaceIndex)[0];
+        line = line.Slice(spaceIndex + 1).TrimStart();
 
-        if (!int.TryParse(line.Slice(index1 + 1, index2 - index1 - 1), out var min)
-            || !int.TryParse(line.Slice(index2 + 1, index3 - index2 - 2), out var max))
+        var dashIndex = line.IndexOf('-');
+        if (!int.TryParse(line.Slice(0, dashIndex), out var min))
         {
             throw new InvalidOperationException();
         }
-            
-        var requiredChar = line[0];
-        var password = line[(index3 + 2)..]; // Still need to convert to Memory<char> to use Trim()
+        line = line.Slice(dashIndex + 1).TrimStart();
 
-        var rule = new ValidationRule
+        var colonIndex = line.IndexOf(':');
+        if (!int.TryParse(line.Slice(0, colonIndex), out var max))
         {
-            RequiredChar = requiredChar,
-            Min = min,
-            Max = max
-        };
-
+            throw new InvalidOperationException();
+        }
+        line = line.Slice(colonIndex + 1).TrimStart();
+        
         return new PasswordEntry
         {
-            Rule = rule,
-            Password = password.ToArray()
+            Rule = new ValidationRule
+            {
+                RequiredChar = requiredChar,
+                Min = min,
+                Max = max
+            },
+            Password = line.Trim().ToString()
         };
     }
 }

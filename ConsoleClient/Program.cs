@@ -1,3 +1,9 @@
-﻿// See https://aka.ms/new-console-template for more information
+﻿using PasswordChecker;
 
-Console.WriteLine("Hello, World!");
+var reader = new PasswordReader();
+
+var x = reader.ReadPasswords("D:/Repositories/trash/PasswordCheckerTestDate.txt");
+foreach (var passwordEntry in x)
+{
+    Console.WriteLine(passwordEntry);
+}
